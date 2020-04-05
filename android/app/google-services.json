@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "18411337000",
+    "firebase_url": "https://wsb-technologie.firebaseio.com",
+    "project_id": "wsb-technologie",
+    "storage_bucket": "wsb-technologie.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:18411337000:android:68b1f25759e48465058c1d",
+        "android_client_info": {
+          "package_name": "com.example.myapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "18411337000-ae8iqbscrb5gjdiqso85ebgivn6qqps9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myapp",
+            "certificate_hash": "8fccfc0f76a96f692c0ec149c6b1ff4e39d122eb"
+          }
+        },
+        {
+          "client_id": "18411337000-m77skv6aptt914ffobr5861s7t0j9pd2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-3l4TgCP2WdRnpmlNkBliohiXrodMqPg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "18411337000-m77skv6aptt914ffobr5861s7t0j9pd2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
