@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _loginWithGoogle() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth =
-    await googleUser.authentication;
+        await googleUser.authentication;
 
     final AuthCredential credential = GoogleAuthProvider.getCredential(
       accessToken: googleAuth.accessToken,
@@ -56,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
         (await _auth.signInWithCredential(credential)).user;
     print("signed in " + user.displayName);
 
-//    var d = await databaseReference.collection("users");
-//    print(d);
+    var d = await databaseReference.collection("users");
+    print(d);
 
     setState(() {
       _user = user;
@@ -104,9 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
       return Text("Login With Google");
     } else {
       return Row(
-        children: [
-          Text(user.displayName),
-          Image.network(user.photoUrl)],
+        children: [Text(user.displayName), Image.network(user.photoUrl)],
       );
     }
   }
