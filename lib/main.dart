@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -34,7 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final databaseReference = Firestore.instance;
+ //final databaseReference = Firestore.instance;
 
   void _incrementCounter() {
     setState(() {
@@ -56,8 +56,8 @@ class _MyHomePageState extends State<MyHomePage> {
         (await _auth.signInWithCredential(credential)).user;
     print("signed in " + user.displayName);
 
-    var d = await databaseReference.collection("users");
-    print(d);
+   // var d = await databaseReference.collection("users");
+    // print(d);
 
     setState(() {
       _user = user;
