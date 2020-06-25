@@ -1,4 +1,4 @@
-//import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -13,9 +13,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'WSB App'),
     );
   }
 }
@@ -29,18 +29,15 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  List<String> chatMessages = [];
+  bool _smallDevice = false;
+
   FirebaseUser _user;
 
   final GoogleSignIn _googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
- //final databaseReference = Firestore.instance;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+  final databaseReference = Firestore.instance;
+  var _textController = TextEditingController(text: "Write here");
 
   void _loginWithGoogle() async {
     final GoogleSignInAccount googleUser = await _googleSignIn.signIn();
@@ -56,47 +53,96 @@ class _MyHomePageState extends State<MyHomePage> {
         (await _auth.signInWithCredential(credential)).user;
     print("signed in " + user.displayName);
 
-   // var d = await databaseReference.collection("users");
-    // print(d);
+    databaseReference.collection('chat').limit(50).snapshots().listen((event) {
+      print("GOT RESPONSE FROM DATABASE ${event.runtimeType}");
+
+      event.documents.reversed.forEach((element) {
+        chatMessages.add("${element['message']} from ${element['user']}");
+      });
+      setState(() {
+        chatMessages = chatMessages.toSet().toList(); //. LOL
+      });
+    });
 
     setState(() {
       _user = user;
-      _counter = 1000;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+    var deviceData = MediaQuery.of(context);
+    print("SIZE ${deviceData.size}");
+    if (deviceData.size.width < 600) {
+      _smallDevice = true;
+    } else {
+      _smallDevice = false;
+    }
+
+    if (chatMessages.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(
+          centerTitle: true,
+          title: Text(widget.title),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RaisedButton(
+                child: _buildUserWidget(_user),
+                onPressed: () {
+                  _loginWithGoogle();
+                },
+              )
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          backgroundColor: _user == null ? Colors.red : Colors.blueGrey,
+          actions: _isLoggedIn(),
+          centerTitle: true,
+          title: Text(widget.title),
+        ),
+        body: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: chatMessages.length,
+                  itemBuilder: (BuildContext ctx, int index) {
+                    return ListTile(title: Text(chatMessages[index]));
+                  }),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-            RaisedButton(
-              child: _buildUserWidget(_user),
-              onPressed: () {
-                _loginWithGoogle();
-              },
+            Align(
+                alignment: Alignment.bottomCenter,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                      border: Border.all(color: Colors.blue, width: 4.0)),
+                  child: TextField(
+                    focusNode: FocusNode(),
+                    cursorColor: Colors.lightGreen,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.black, height: 5),
+                    onSubmitted: (text) {
+                      _sendMessageToFirebase(text);
+                      _textController.value = TextEditingValue(text: "");
+                    },
+                    controller: _textController,
+                  ),
+                )),
+            Container(
+              child: _smallDevice == true
+                  ? Text("Small Device")
+                  : Text("Large Device"),
             )
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.android),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
+      );
+    }
   }
 
   Widget _buildUserWidget(FirebaseUser user) {
@@ -106,6 +152,28 @@ class _MyHomePageState extends State<MyHomePage> {
       return Row(
         children: [Text(user.displayName), Image.network(user.photoUrl)],
       );
+    }
+  }
+
+  List<Widget> _isLoggedIn() {
+    if (_user == null) {
+      return [Text("Guest")];
+    } else {
+      return [
+        Image.network("${_user.photoUrl}"),
+        Text(
+          _user.displayName,
+          style: TextStyle(color: Colors.white),
+        ),
+      ];
+    }
+  }
+
+  void _sendMessageToFirebase(String text) async {
+    if (text != "Write here") {
+      DocumentReference ref = await databaseReference
+          .collection("chat")
+          .add({'message': text, 'user': _user.email});
     }
   }
 }
