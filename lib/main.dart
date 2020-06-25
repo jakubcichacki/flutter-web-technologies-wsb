@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
         chatMessages.add("${element['message']} from ${element['user']}");
       });
       setState(() {
-        chatMessages = chatMessages.toSet().toList(); //. LOL
+        chatMessages = chatMessages.toSet().toList();
       });
     });
 
